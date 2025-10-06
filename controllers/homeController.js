@@ -1,4 +1,4 @@
-const Event = require('../models/eventModel');
+const Event = require('../models/eventModels');
 
 
 const getHomePage = async (req, res) => {
@@ -16,6 +16,8 @@ const getHomePage = async (req, res) => {
 
 const addEventPage = (req, res) => {
   res.render('addEvent', { title: 'Add New Event' });
+
+
 }  
 
 
