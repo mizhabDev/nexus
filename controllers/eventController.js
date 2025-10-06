@@ -2,19 +2,6 @@ const express = require('express');
 const Event = require('../models/eventModels');
 const router = express.Router();
 
-// const eventController = {
-//     createEvent: async (req, res) => {
-//         try {
-//             const { title, date, time, location, price, description, userId } = req.body;
-//             const newEvent = new Event({ title, date, time, location, price, description, userId });
-//             await newEvent.save();
-//             res.redirect('/home');
-//         } catch (error) {
-//             console.error('Error creating event:', error);
-//             res.status(500).send('Internal Server Error');
-//         }
-//     }
-// };
 
 
 const createEvent = async (req, res) => {
@@ -48,6 +35,7 @@ const createEvent = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
 
 
 

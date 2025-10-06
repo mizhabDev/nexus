@@ -10,6 +10,7 @@ const eventController = require('../controllers/eventController.js');
 router.get('/home', homeController.getHomePage);
 router.get('/', homeController.getHomePage);
 router.get('/addEvent', homeController.addEventPage);
+router.get('/login',homeController.getloginPage);
 
 
 
