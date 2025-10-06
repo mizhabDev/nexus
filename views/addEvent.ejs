@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Event - Nexus Events Co.</title>
+    <link rel="stylesheet" href="/style/addEvent.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="/img/logo.png" alt="Nexus Events Logo" class="logo">
+                    <div class="brand-info">
+                        <div class="brand-name">Nexus Events Co.</div>
+                        <div class="brand-tagline">Event Management</div>
+                    </div>
+                </div>
+
+                <a href="#" class="back-link" onclick="goBack()">← Back to Events</a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <h1 class="page-title">Add New Event</h1>
+            <p class="page-subtitle">Fill in the details below to create your event</p>
+
+            <form class="event-form" id="eventForm" onsubmit="handleSubmit(event)">
+                <!-- Event Title -->
+                <div class="form-group">
+                    <label class="form-label" for="eventTitle">Event Title *</label>
+                    <input type="text" id="eventTitle" class="form-input" placeholder="Enter event title" required>
+                    <p class="form-hint">Give your event a clear and descriptive title</p>
+                </div>
+
+                <!-- Event Description -->
+                <div class="form-group">
+                    <label class="form-label" for="eventDescription">Description *</label>
+                    <textarea id="eventDescription" class="form-textarea" placeholder="Describe your event..."
+                        required></textarea>
+                    <p class="form-hint">Include key details about what attendees can expect</p>
+                </div>
+
+                <!-- Date and Time -->
+                <div class="form-group">
+                    <label class="form-label">Date & Time *</label>
+                    <div class="datetime-grid">
+                        <div>
+                            <input type="date" id="eventDate" class="form-input" required>
+                        </div>
+                        <div>
+                            <input type="time" id="eventTime" class="form-input" required>
+                        </div>
+                    </div>
+                    <p class="form-hint">Select when your event will take place</p>
+                </div>
+
+                <!-- Location -->
+                <div class="form-group">
+                    <label class="form-label" for="eventLocation">Location *</label>
+                    <input type="text" id="eventLocation" class="form-input" placeholder="Enter event location"
+                        required>
+                    <p class="form-hint">Specify the venue or address</p>
+                </div>
+
+                <!-- Price -->
+                <div class="form-group">
+                    <label class="form-label" for="eventPrice">Price</label>
+                    <input type="text" id="eventPrice" class="form-input" placeholder="$0.00 or Free">
+                    <p class="form-hint">Leave blank or enter "Free" for free events</p>
+                </div>
+
+                <!-- Event Image -->
+                <div class="form-group">
+                    <label class="form-label">Event Image *</label>
+                    <div class="image-upload-area" id="uploadArea"
+                        onclick="document.getElementById('imageInput').click()">
+                        <div class="upload-icon">📷</div>
+                        <div class="upload-text">Click to upload or drag and drop</div>
+                        <div class="upload-hint">PNG, JPG or JPEG (max. 5MB)</div>
+                    </div>
+                    <input type="file" id="imageInput" accept="image/*" onchange="handleImageSelect(event)">
+
+                    <div class="image-preview" id="imagePreview">
+                        <div class="preview-container">
+                            <img id="previewImage" class="preview-image" src="" alt="Preview">
+                            <button type="button" class="remove-image" onclick="removeImage()">×</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category -->
+                <div class="form-group">
+                    <label class="form-label" for="eventCategory">Category</label>
+                    <select id="eventCategory" class="form-select">
+                        <option value="">Select a category</option>
+                        <option value="conference">Conference</option>
+                        <option value="festival">Festival</option>
+                        <option value="networking">Networking</option>
+                        <option value="workshop">Workshop</option>
+                        <option value="concert">Concert</option>
+                        <option value="exhibition">Exhibition</option>
+                        <option value="sports">Sports</option>
+                        <option value="charity">Charity</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Create Event</button>
+                    <button type="button" class="btn btn-cancel" onclick="goBack()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let selectedImage = null;
+
+        function goBack() {
+            if (confirm('Are you sure you want to go back? Any unsaved changes will be lost.')) {
+                window.history.back();
+            }
+        }
+
+        function handleImageSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size must be less than 5MB');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    selectedImage = e.target.result;
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                    document.getElementById('uploadArea').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeImage() {
+            selectedImage = null;
+            document.getElementById('imageInput').value = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('uploadArea').style.display = 'block';
+        }
+
+        // Drag and drop functionality
+        const uploadArea = document.getElementById('uploadArea');
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                document.getElementById('imageInput').files = dataTransfer.files;
+                handleImageSelect({ target: { files: [file] } });
+            }
+        });
+
+        async function handleSubmit(event) {
+            event.preventDefault();
+
+            const formData = {
+                title: document.getElementById('eventTitle').value,
+                description: document.getElementById('eventDescription').value,
+                date: document.getElementById('eventDate').value,
+                time: document.getElementById('eventTime').value,
+                location: document.getElementById('eventLocation').value,
+                price: document.getElementById('eventPrice').value || 'Free',
+                category: document.getElementById('eventCategory').value,
+                image: selectedImage
+            };
+
+            console.log('Event Created:', formData);
+           
+
+            // data is sending to server
+            try {
+                const response = await fetch('/add-event', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert('Event submitted successfully!');
+                    window.location.href = '/'; // Redirect to home or events page
+                } else {
+                    alert('Failed to submit event. Please try again.in line number 214');
+                    console.error('Server responded with status:', Response.status);
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert('There was an error submitting the form. Please try again.');
+                return;
+
+            }
+
+
+        }
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('eventDate').setAttribute('min', today);
+    </script>
+</body>
+
+</html>

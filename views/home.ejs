@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Events Co. - Event Management</title>
+    <link rel="stylesheet" href="/style/home.css">
+    
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo-section">
+                <img src="/img/logo.png" alt="Nexus Events Logo" class="logo">
+                <div>
+                    <div class="brand-name">Nexus Events Co.</div>
+                    <div class="brand-tagline">Event Management</div>
+                </div>
+            </div>
+
+            <!-- Search Section -->
+            <div class="search-section">
+                <div class="search-bar">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search events...">
+                    <button class="btn-search" onclick="handleSearch()">🔍</button>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <button class="btn btn-signup" onclick="handleSignup()">Sign Up</button>
+                <button class="btn btn-add-event" onclick="handleAddEvent()">+ Add New Event</button>
+            </div>
+        </header>
+
+        <!-- Events Section -->
+        <div class="events-section">
+            <h2 class="section-title">Upcoming Events</h2>
+            <div class="events-grid" id="eventsGrid">
+                <% if (events && events.length > 0) { %>
+                    <% events.forEach(event => { %>
+                        <div class="event-card">
+                            <div class="event-title"><%= event.title %></div>
+                            <div class="event-date">📅 <%= new Date(event.date).toLocaleDateString() %></div>
+                            <div class="event-time">⏰ <%= event.time %></div>
+                            <div class="event-description"><%= event.description %></div>
+                            <div class="event-location">📍 <%= event.location %></div>
+                            <div class="event-price">💰 <%= event.price || 'Free' %></div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <p class="no-events">No events found</p>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleSignup() {
+            alert('Sign Up feature - This would open a registration form');
+        }
+
+        function handleAddEvent() {
+            alert('Add New Event - This would open an event creation form');
+        }
+
+        function handleSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const eventCards = document.querySelectorAll('.event-card');
+            let foundCount = 0;
+
+            eventCards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                    foundCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (foundCount === 0 && searchTerm !== '') {
+                alert('No events found matching your search.');
+            }
+        }
+
+        // Allow search on Enter key
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleSearch();
+            }
+        });
+    </script>
+</body>
+</html>
