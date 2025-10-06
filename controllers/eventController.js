@@ -50,8 +50,12 @@ const createEvent = async (req, res) => {
 };
 
 
+
+
+
 module.exports = {
-    createEvent
+    createEvent,
+  
 };
 
 
