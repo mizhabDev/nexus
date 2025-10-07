@@ -1,6 +1,7 @@
 const Event = require('../models/eventModels');
 const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 
 
@@ -42,12 +43,15 @@ const createNewUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create and save new user
-    const newUser = new User({ name, email, password:hashedPassword });
+    const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save();
 
-    res.status(200).json({ message: 'User created successfully' });
-
     
+
+    return res.status(200).json({ message: 'User created successfully' });
+    
+
+
   } catch (error) {
     console.error('Error creating user:', error);
     res.status(500).render('login', { title: 'Login', error: 'Internal Server Error' });
@@ -57,6 +61,47 @@ const createNewUser = async (req, res) => {
 
 
 }
+
+const userExists = async (req,res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    // Find user
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    // Check password
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    // Create JWT token
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    // Set cookie with token (HTTP-only, secure if using HTTPS)
+    res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
+
+
+    return res.status(200).json({
+      success: true,
+      message: 'Sign in successful',
+      
+    });
+    
+
+  } catch (error) {
+    console.error('Sign in error:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
 
 
 const searchEvents = async (req, res) => {
@@ -92,11 +137,21 @@ const getloginPage = (req, res) => {
 }
 
 
+const logoutUser = (req, res) => {
+  res.clearCookie('jwt');
+  res.redirect('/login');
+
+}
+
+
+
 
 module.exports = {
   getHomePage,
   addEventPage,
   searchEvents,
   getloginPage,
-  createNewUser
+  createNewUser,
+  userExists,
+  logoutUser
 };
