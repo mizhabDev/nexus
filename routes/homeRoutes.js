@@ -16,6 +16,9 @@ router.get('/login',homeController.getloginPage);
 
 // post router
 router.post('/add-event', eventController.createEvent);
+router.post('/signup', homeController.createNewUser);
+
 
 
 module.exports = router;
+

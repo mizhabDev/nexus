@@ -1,4 +1,7 @@
 const Event = require('../models/eventModels');
+const User = require('../models/userModel');
+const bcrypt = require('bcryptjs');
+
 
 
 const getHomePage = async (req, res) => {
@@ -20,6 +23,40 @@ const addEventPage = (req, res) => {
 
 }
 
+const createNewUser = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    console.log('Received user data:', req.body); // Debug logging
+
+    // Basic validation
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: 'This is form backend All fields are required.' });
+    }
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: 'User with this email already exists.' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create and save new user
+    const newUser = new User({ name, email, password:hashedPassword });
+    await newUser.save();
+
+    res.status(200).json({ message: 'User created successfully' });
+
+    
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).render('login', { title: 'Login', error: 'Internal Server Error' });
+
+  }
+
+
+
+}
 
 
 const searchEvents = async (req, res) => {
@@ -60,5 +97,6 @@ module.exports = {
   getHomePage,
   addEventPage,
   searchEvents,
-  getloginPage
+  getloginPage,
+  createNewUser
 };
