@@ -32,7 +32,7 @@
             <div class="header-actions">
                 <% if (user) { %>
                     <!-- User is signed in: show About Me logo and user name -->
-                    <div class="user-info" onclick="userInfo()">
+                    <div class="user-info" onclick="userInfo(<%= user ? JSON.stringify(user) : 'null' %>)" >
                         <svg class="userLogo" width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
                             <!-- Simple person icon -->
                             <g fill="#6b7280">
@@ -137,7 +137,32 @@
                 alert('No events found matching your search.');
             }
         }
-        function userInfo() {
+        async function userInfo(user) {
+            console.log(user);
+
+            window.location.href ="/user-info";
+            // try {
+            //     const res=await fetch('/user-info', {
+            //         method: 'GET',
+            //         headers: {
+            //             'Content-Type': 'application/json',
+            //             'Authorization': `Bearer ${localStorage.getItem("token")}`
+            //         },
+            //         credentials:"same-origin"
+            //     })
+            //     if(!res.ok){
+            //         throw new Error(`Not logged in ${res.status}`);
+            //     }
+            //     const data=await res.json();
+            //     console.log(data);
+            //      window.location.href = `/user-info?data=${encodeURIComponent(JSON.stringify(data.user))}`;
+                
+            // } catch (error) {
+            //     console.error('Error fetching user info from front:', error);
+            //     alert('An error occurred while fetching user info. Please try again later.');
+                
+            // }
+
             
         }
 

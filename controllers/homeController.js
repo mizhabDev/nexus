@@ -46,10 +46,10 @@ const createNewUser = async (req, res) => {
     const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save();
 
-    
+
 
     return res.status(200).json({ message: 'User created successfully' });
-    
+
 
 
   } catch (error) {
@@ -62,7 +62,7 @@ const createNewUser = async (req, res) => {
 
 }
 
-const userExists = async (req,res) => {
+const userExists = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -93,9 +93,9 @@ const userExists = async (req,res) => {
     return res.status(200).json({
       success: true,
       message: 'Sign in successful',
-      
+
     });
-    
+
 
   } catch (error) {
     console.error('Sign in error:', error);
@@ -143,6 +143,31 @@ const logoutUser = (req, res) => {
 
 }
 
+const getUserInfo = async (req, res) => {
+  try {
+    // Get user from auth middleware
+    const user = req.user;
+    console.log('Authenticated user:', user);
+
+    if (!user) {
+      return res.status(401).json({ error: 'Login first' });
+    }
+
+    return res.status(200).render('userInfo', {
+      title: 'User Profile',
+      user: {
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching user info from backend:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
 
 
 
@@ -153,5 +178,6 @@ module.exports = {
   getloginPage,
   createNewUser,
   userExists,
-  logoutUser
+  logoutUser,
+  getUserInfo
 };

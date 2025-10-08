@@ -12,6 +12,7 @@ router.get('/home',requireAuth, homeController.getHomePage);
 router.get('/',homeController.getHomePage);
 router.get('/addEvent',requireAuth,homeController.addEventPage);
 router.get('/login',homeController.getloginPage);
+router.get('/user-info',requireAuth,homeController.getUserInfo);
 
 
 
