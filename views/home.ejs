@@ -116,6 +116,7 @@
 
         function handleAddEvent() {
             alert('Add New Event - This would open an event creation form');
+            window.location.href ="/add-event";
         }
 
         function handleSearch() {
@@ -138,31 +139,11 @@
             }
         }
         async function userInfo(user) {
-            console.log(user);
-
+            if (!user) {
+                alert('Please log in to view your profile.');
+                return;
+            }
             window.location.href ="/user-info";
-            // try {
-            //     const res=await fetch('/user-info', {
-            //         method: 'GET',
-            //         headers: {
-            //             'Content-Type': 'application/json',
-            //             'Authorization': `Bearer ${localStorage.getItem("token")}`
-            //         },
-            //         credentials:"same-origin"
-            //     })
-            //     if(!res.ok){
-            //         throw new Error(`Not logged in ${res.status}`);
-            //     }
-            //     const data=await res.json();
-            //     console.log(data);
-            //      window.location.href = `/user-info?data=${encodeURIComponent(JSON.stringify(data.user))}`;
-                
-            // } catch (error) {
-            //     console.error('Error fetching user info from front:', error);
-            //     alert('An error occurred while fetching user info. Please try again later.');
-                
-            // }
-
             
         }
 
