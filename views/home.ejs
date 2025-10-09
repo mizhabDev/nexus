@@ -31,9 +31,10 @@
 
             <div class="header-actions">
                 <% if (user) { %>
-                    <!-- User is signed in: show About Me logo and user name -->
-                    <div class="user-info" onclick="userInfo(<%= user ? JSON.stringify(user) : 'null' %>)" >
-                        <svg class="userLogo" width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+
+                    <div class="user-info" onclick="userInfo(<%= user ? JSON.stringify(user) : 'null' %>)">
+                        <svg class="userLogo" width="40" height="40" viewBox="0 0 40 40"
+                            xmlns="http://www.w3.org/2000/svg">
                             <!-- Simple person icon -->
                             <g fill="#6b7280">
                                 <!-- Head -->
@@ -43,9 +44,11 @@
                                 <path d="M 20 20 C 14 20 10 23 10 28 L 10 30 L 30 30 L 30 28 C 30 23 26 20 20 20 Z" />
                             </g>
                         </svg>
-                        <span class="user-name"><%= user.name %></span>
+                        <span class="user-name">
+                            <%= user.name %>
+                        </span>
                     </div>
-                    
+
                     <% } else { %>
                         <!-- User NOT signed in: show Sign Up and Add Event buttons -->
                         <button class="btn btn-signup" onclick="handleSignup()">Sign Up</button>
@@ -66,7 +69,15 @@
             <div class="events-grid" id="eventsGrid">
                 <% if (events && events.length> 0) { %>
                     <% events.forEach(event=> { %>
-                        <div class="event-card">
+
+
+                        <div class="event-card" data-event-id="<%= event._id %>" data-event-date="<%= event.date %>"
+                            data-event-time="<%= event.time %>" data-event-location="<%= event.location %>"
+                            data-event-prize="<%= event.price || 'Free' %>" data-event-creator="<%= event.createdBy %>"
+                            onclick="openEventModal(this)">
+
+
+
                             <div class="event-title">
                                 <%= event.title %>
                             </div>
@@ -94,66 +105,71 @@
         </div>
     </div>
 
-    <script>
-        async function handleSignup() {
-            try {
-                const response = await fetch('/login', {
-                    method: 'GET',
-                });
+    <!-- Event Modal Partial -->
+    <%- include('partials/eventModal') %>
 
-                if (response.ok) {
-                    window.location.href = response.url;
-                } else {
-                    alert('Failed to initiate Google Sign-In.');
+        <script>
+            async function handleSignup() {
+                try {
+                    const response = await fetch('/login', {
+                        method: 'GET',
+                    });
+
+                    if (response.ok) {
+                        window.location.href = response.url;
+                    } else {
+                        alert('Failed to initiate Google Sign-In.');
+                    }
+                } catch (error) {
+                    console.error('Error during Google Sign-In:', error);
+                    alert('An error occurred. Please try again later.');
                 }
-            } catch (error) {
-                console.error('Error during Google Sign-In:', error);
-                alert('An error occurred. Please try again later.');
+
+
             }
 
+            function handleAddEvent() {
+                alert('Add New Event - This would open an event creation form');
+                window.location.href = "/add-event";
+            }
 
-        }
+            function handleSearch() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                const eventCards = document.querySelectorAll('.event-card');
+                let foundCount = 0;
 
-        function handleAddEvent() {
-            alert('Add New Event - This would open an event creation form');
-            window.location.href ="/add-event";
-        }
+                eventCards.forEach(card => {
+                    const text = card.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        card.style.display = 'block';
+                        foundCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
 
-        function handleSearch() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const eventCards = document.querySelectorAll('.event-card');
-            let foundCount = 0;
+                if (foundCount === 0 && searchTerm !== '') {
+                    alert('No events found matching your search.');
+                }
+            }
+            async function userInfo(user) {
+                if (!user) {
+                    alert('Please log in to view your profile.');
+                    return;
+                }
+                window.location.href = "/user-info";
 
-            eventCards.forEach(card => {
-                const text = card.textContent.toLowerCase();
-                if (text.includes(searchTerm)) {
-                    card.style.display = 'block';
-                    foundCount++;
-                } else {
-                    card.style.display = 'none';
+            }
+
+            // Allow search on Enter key
+            document.getElementById('searchInput').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    handleSearch();
                 }
             });
 
-            if (foundCount === 0 && searchTerm !== '') {
-                alert('No events found matching your search.');
-            }
-        }
-        async function userInfo(user) {
-            if (!user) {
-                alert('Please log in to view your profile.');
-                return;
-            }
-            window.location.href ="/user-info";
-            
-        }
 
-        // Allow search on Enter key
-        document.getElementById('searchInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                handleSearch();
-            }
-        });
-    </script>
+        </script>
 </body>
 
 </html>
