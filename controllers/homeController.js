@@ -149,8 +149,11 @@ const getUserInfo = async (req, res) => {
     const user = req.user;
     console.log('Authenticated user:', user);
 
-    const userEvent = await Event.find({attendees: user._id}).sort({ createdAt: -1 });
-    console.log('User booked events:', userEvent);
+    const userEvent = await Event.find({createdBy: user._id}).sort({ createdAt: -1 });
+    console.log('User created events:', userEvent);
+
+    const joinedEvents = await Event.find({ attendees: user._id }).sort({ createdAt: -1 });
+    console.log('--------------------------------------------------------------------------------------------------------------------------------------------------------Joined events:', joinedEvents);
 
 
 
@@ -165,7 +168,8 @@ const getUserInfo = async (req, res) => {
         email: user.email,
         createdAt: user.createdAt,
       },
-      userEvents: userEvent
+      userEvents: userEvent,
+      joinedEvents: joinedEvents
     });
 
 

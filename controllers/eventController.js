@@ -12,6 +12,9 @@ const createEvent = async (req, res) => {
         }
 
         const { title, date, time, location, price, description } = req.body;
+
+        const use = req.user;
+        console.log('Authenticated user in createEvent:', use); // Debug logging
         
         // Validate required fields
         if (!title || !date || !time || !location) {
@@ -24,7 +27,9 @@ const createEvent = async (req, res) => {
             time,
             location,
             price: price || 'Free',
-            description
+            description,
+            createdBy: use._id
+
         });
 
         await newEvent.save();

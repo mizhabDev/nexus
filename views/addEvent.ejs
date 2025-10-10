@@ -94,23 +94,6 @@
                     </div>
                 </div>
 
-                <!-- Category -->
-                <div class="form-group">
-                    <label class="form-label" for="eventCategory">Category</label>
-                    <select id="eventCategory" class="form-select">
-                        <option value="">Select a category</option>
-                        <option value="conference">Conference</option>
-                        <option value="festival">Festival</option>
-                        <option value="networking">Networking</option>
-                        <option value="workshop">Workshop</option>
-                        <option value="concert">Concert</option>
-                        <option value="exhibition">Exhibition</option>
-                        <option value="sports">Sports</option>
-                        <option value="charity">Charity</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-
                 <!-- Form Actions -->
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Create Event</button>
@@ -190,8 +173,6 @@
                 time: document.getElementById('eventTime').value,
                 location: document.getElementById('eventLocation').value,
                 price: document.getElementById('eventPrice').value || 'Free',
-                category: document.getElementById('eventCategory').value,
-                image: selectedImage
             };
 
             console.log('Event Created:', formData);
