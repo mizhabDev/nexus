@@ -13,6 +13,8 @@ router.get('/',homeController.getHomePage);
 router.get('/add-event',requireAuth,homeController.addEventPage);
 router.get('/login',homeController.getloginPage);
 router.get('/user-info',requireAuth,homeController.getUserInfo);
+router.get('/book-event/:userId/:eventId',requireAuth,homeController.bookMyEvent);
+router.get('/is-booked/:userId/:eventId',requireAuth,homeController.isEventBooked);
 
 
 

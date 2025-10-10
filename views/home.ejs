@@ -71,9 +71,17 @@
                     <% events.forEach(event=> { %>
 
 
-                        <div class="event-card" data-event-id="<%= event._id %>" data-event-date="<%= event.date %>"
-                            data-event-time="<%= event.time %>" data-event-location="<%= event.location %>"
-                            data-event-prize="<%= event.price || 'Free' %>" data-event-creator="<%= event.createdBy %>"
+                        <div class="event-card" 
+                            data-event-id="<%= event._id %>"
+                            data-event-title="<%= event.title %>" 
+                            data-event-description="<%= event.description %>"
+                            data-event-date="<%= event.date %>"
+                            data-event-time="<%= event.time %>" 
+                            data-event-location="<%= event.location %>"
+                            data-event-prize="<%= event.price || 'Free' %>" 
+                            data-event-creator="<%= event.createdBy %>"
+                            
+                            userId="<%= user ? user._id : null %>" 
                             onclick="openEventModal(this)">
 
 
@@ -109,6 +117,13 @@
     <%- include('partials/eventModal') %>
 
         <script>
+            var user = <% - JSON.stringify(user || null) %>
+            
+            console.log('User Data:', user); // Debug log
+            
+
+
+
             async function handleSignup() {
                 try {
                     const response = await fetch('/login', {
@@ -152,6 +167,7 @@
                     alert('No events found matching your search.');
                 }
             }
+
             async function userInfo(user) {
                 if (!user) {
                     alert('Please log in to view your profile.');

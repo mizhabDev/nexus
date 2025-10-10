@@ -1,4 +1,3 @@
-
 <link rel="stylesheet" href="/style/eventModal.css">
 
 <!-- Event Details Modal -->
@@ -8,7 +7,7 @@
             <h2 class="modal-title" id="modalEventTitle">Event Title</h2>
             <button class="modal-close" onclick="closeModal()">&times;</button>
         </div>
-        
+
         <div class="modal-body">
             <div class="modal-detail">
                 <div class="modal-label">📅 Date & Time</div>
@@ -38,105 +37,179 @@
 
         <div class="modal-footer">
             <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-            <button class="btn-book" onclick="bookEvent()">Book Event</button>
+            <button class="btn-book" userId="<%= user ? user._id : null %>">Book </button>
         </div>
     </div>
 </div>
 
 <script>
-// Function to open modal with event details
-function openEventModal(event) {
-    try{
     const modal = document.getElementById('eventModal');
-  
-    console.log("this is form event "+event);
-    console.log("this from modal"+modal);
+    const bookBtn = modal.querySelector('.btn-book');
+    const userId = bookBtn.getAttribute('userId');
 
-    // Parse date and time from your event object
-    let eventDate = new Date(event.date);        
-    let eventTime = event.time;                 
+    // Function to open modal with event details
+    async function openEventModal(event) {
+        try {
+            console.log('Event Data:', event); // Debug log
+            console.log('User ID:', userId); // Debug log
+            console.log('Attendees:', event.attendees); // Debug log
 
-    let formattedDate = eventDate
-      .toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
 
-    // Format time: "12:00 am"
-    let timeObj = new Date('1970-01-01T' + eventTime);
-    let formattedTime = timeObj
-      .toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+            // Parse date and time from your event object
+            let eventDate = new Date(event.date);
+            let eventTime = event.time;
 
-    
-    // Populate modal with event data
-    document.getElementById('modalEventTitle').textContent = event.title;
-    document.getElementById('modalEventDateTime').textContent = 
-        `${formattedDate} at ${formattedTime}`;
-    document.getElementById('modalEventDescription').textContent = event.description;
-    document.getElementById('modalEventLocation').textContent = event.location;
-    document.getElementById('modalEventPrize').textContent = event.prize;
-    document.getElementById('modalEventCreator').textContent = event.createdBy;
-    
-    // Store event ID for booking
-    modal.dataset.eventId = event.id;
-    
-    // Show modal
-    modal.classList.add('active');
-    } catch(error){
-        console.error("Error opening modal:", error);
-         console.log('Event element:', eventElement);
-        console.log('Data attribute:', eventElement.getAttribute('data-event'));
+            let formattedDate = eventDate
+                .toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+            // Format time: "12:00 am"
+            let timeObj = new Date('1970-01-01T' + eventTime);
+            let formattedTime = timeObj
+                .toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+
+
+            // Populate modal with event data
+            document.getElementById('modalEventTitle').textContent = event.title;
+            document.getElementById('modalEventDateTime').textContent =
+                `${formattedDate} at ${formattedTime}`;
+            document.getElementById('modalEventDescription').textContent = event.description;
+            document.getElementById('modalEventLocation').textContent = event.location;
+            document.getElementById('modalEventPrize').textContent = event.prize;
+            document.getElementById('modalEventCreator').textContent = event.createdBy;
+
+            // Store event ID for booking
+            modal.dataset.eventId = event.id;
+
+            //check already booked
+            const isBooked = await fetch(`/is-booked/${userId}/${event.id}`)
+    .then(res => {
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+    })
+    .then(data => data.isBooked)  // this will be true or false
+    .catch(err => {
+        console.error('Error checking booking status:', err);
+        return false; // default to false if something goes wrong
+    });
+
+
+
+            if (isBooked) {
+                bookBtn.textContent = 'Unbook Event';
+                bookBtn.onclick = () => unbookEvent(event.id);
+            } else {
+                bookBtn.textContent = 'Book Event';
+                bookBtn.onclick = () => bookEvent(event.id);
+            }
+
+
+            // Show modal
+            modal.classList.add('active');
+        } catch (error) {
+            console.error("Error opening modal:", error);
+            alert("An error occurred while opening the event details. Please try again later.");
+        }
     }
-}
 
-// Function to close modal
-function closeModal() {
-    const modal = document.getElementById('eventModal');
-    modal.classList.remove('active');
-}
-
-// Function to book event
-function bookEvent() {
-    const modal = document.getElementById('eventModal');
-    const eventId = modal.dataset.eventId;
-    
-    // Add your booking logic here
-    // For example, redirect to booking page or make API call
-    window.location.href = `/book-event/${eventId}`;
-}
-
-// Close modal when clicking outside
-window.onclick = function(event) {
-    const modal = document.getElementById('eventModal');
-    if (event.target === modal) {
-        closeModal();
+    // Function to close modal
+    function closeModal() {
+        const modal = document.getElementById('eventModal');
+        modal.classList.remove('active');
     }
-}
 
-// Close modal on Escape key
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        closeModal();
+    // Function to book event
+    function bookEvent(event) {
+        const modal = document.getElementById('eventModal');
+
+        try {
+
+            fetch(`/book-event/${userId}/${modal.dataset.eventId}`
+                , {
+                    method: 'GET',
+                })
+                .then(response => response.json())
+                .then(response => {
+                    if (response.message) {
+                        alert(response.message);
+                        closeModal();
+                    } else {
+                        alert("Failed to book event. Please try again.");
+                    }
+                })
+
+        } catch (error) {
+            console.error("Error booking event:", error);
+            alert("An error occurred while booking the event. Please try again later.");
+
+        }
+        // For example, redirect to booking page or make API call
+
     }
-}); 
 
-// Example: Add click listeners to event cards
-document.addEventListener('DOMContentLoaded', function() {
-    const eventCards = document.querySelectorAll('.event-card');
-    
-    eventCards.forEach(card => {
-        card.addEventListener('click', function() {
-            // Get event data from card or data attributes
-            const eventData = {
-                id: this.dataset.eventId,
-                title: this.querySelector('.event-title').textContent,
-                date: this.dataset.eventDate,
-                time: this.dataset.eventTime,
-                description: this.querySelector('.event-description').textContent,
-                location: this.dataset.eventLocation,
-                prize: this.dataset.eventPrize,
-                createdBy: this.dataset.eventCreator
-            };
-            
-            openEventModal(eventData);
+    function unbookEvent(eventId) {
+        const modal = document.getElementById('eventModal');
+
+        try {
+
+            fetch(`/unbook-event/${user._id}/${modal.dataset.eventId}`
+                , {
+                    method: 'POST',
+                })
+                .then(response => response.json())
+                .then(response => {
+                    if (response.message) {
+                        alert(response.message);
+                        closeModal();
+                    } else {
+                        alert("Failed to unbook event. Please try again.");
+                    }
+                })
+
+        } catch (error) {
+            console.error("Error unbooking event:", error);
+            alert("An error occurred while unbooking the event. Please try again later.");
+
+        }
+
+
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function (event) {
+        const modal = document.getElementById('eventModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeModal();
+        }
+    });
+
+    // Example: Add click listeners to event cards
+    document.addEventListener('DOMContentLoaded', function () {
+        const eventCards = document.querySelectorAll('.event-card');
+
+        eventCards.forEach(card => {
+            card.addEventListener('click', function () {
+                // Get event data from card or data attributes
+                const eventData = {
+                    id: this.dataset.eventId,
+                    title: this.querySelector('.event-title').textContent,
+                    date: this.dataset.eventDate,
+                    time: this.dataset.eventTime,
+                    description: this.querySelector('.event-description').textContent,
+                    location: this.dataset.eventLocation,
+                    prize: this.dataset.eventPrize,
+                    createdBy: this.dataset.eventCreator
+                };
+
+                openEventModal(eventData);
+            });
         });
     });
-});
 </script>

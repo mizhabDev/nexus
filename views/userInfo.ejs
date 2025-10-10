@@ -34,9 +34,17 @@
         <!-- Profile Section -->
         <div class="profile-section">
             <div class="profile-header">
-                <div class="profile-avatar">
-                    <%= user.name.charAt(0).toUpperCase() %>
-                </div>
+                <svg class="userLogo" width="40" height="40" viewBox="0 0 40 40"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <!-- Simple person icon -->
+                            <g fill="#6b7280">
+                                <!-- Head -->
+                                <circle cx="20" cy="14" r="5" />
+
+                                <!-- Body -->
+                                <path d="M 20 20 C 14 20 10 23 10 28 L 10 30 L 30 30 L 30 28 C 30 23 26 20 20 20 Z" />
+                            </g>
+                        </svg>
                 <div class="profile-info">
                     <h2>
                         <%= user.name %>
@@ -53,10 +61,7 @@
                     </span>
                 </div>
 
-                <div class="detail-item">
-                    <span class="detail-label">Total Events</span>
-
-                </div>
+                
                 <div class="detail-item">
                     <span class="detail-label">Member Since</span>
                     <span class="detail-value">
@@ -65,6 +70,95 @@
                 </div>
             </div>
         </div>
+        <br>
+        <hr>
+        <br>
+
+
+
+        <!-- My Events Section -->
+        <div class="events-section">
+            <h2>My Events</h2>
+            
+            <% if (userEvents.length > 0) { %>
+                <div class="events-grid">
+                    <% userEvents.forEach(function(event) { %>
+                        <div class="event-card">
+                            <h3 class="event-title"><%= event.title %></h3>
+                            
+                            <div class="event-info">
+                                <div class="event-info-item">
+                                    📅 <%= new Date(event.date).toLocaleDateString('en-GB') %>
+                                </div>
+                                <div class="event-info-item">
+                                    🕐 <%= event.time %>
+                                </div>
+                            </div>
+                            
+                            <p class="event-description"><%= event.description %></p>
+                            
+                            <div class="event-location">
+                                <span>📍 <%= event.location %></span>
+                            </div>
+                            
+                            <div class="event-info-item">
+                                <span>💰 <%= event.price %></span>
+                            </div>
+                            
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="no-events">
+                    <p>You haven't created any events yet.</p>
+                    <a href="/events/new" class="btn btn-dark" style="margin-top: 1rem;">Create Your First Event</a>
+                </div>
+            <% } %>
+        </div>
+        <br><hr><br>
+
+
+
+        <!-- M -->
+        <div class="events-section">
+            <h2>My Events</h2>
+            
+            <% if (userEvents.length > 0) { %>
+                <div class="events-grid">
+                    <% userEvents.forEach(function(event) { %>
+                        <div class="event-card">
+                            <h3 class="event-title"><%= event.title %></h3>
+                            
+                            <div class="event-info">
+                                <div class="event-info-item">
+                                    📅 <%= new Date(event.date).toLocaleDateString('en-GB') %>
+                                </div>
+                                <div class="event-info-item">
+                                    🕐 <%= event.time %>
+                                </div>
+                            </div>
+                            
+                            <p class="event-description"><%= event.description %></p>
+                            
+                            <div class="event-location">
+                                <span>📍 <%= event.location %></span>
+                            </div>
+                            
+                            <div class="event-info-item">
+                                <span>💰 <%= event.price %></span>
+                            </div>
+                            
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="no-events">
+                    <p>You haven't created any events yet.</p>
+                    <a href="/events/new" class="btn btn-dark" style="margin-top: 1rem;">Create Your First Event</a>
+                </div>
+            <% } %>
+        </div>
+        <br><hr><br>
 
     </div>
 </body>

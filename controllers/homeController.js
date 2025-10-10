@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const getHomePage = async (req, res) => {
   try {
     const events = await Event.find().sort({ createdAt: -1 });
-    console.log(events);
+    console.log("--------------------------------------------------------------------------------------------------------------------------------------------------this getHomepage from home controller",events);
     return res.render('home', { title: 'Home', events });
 
   } catch (error) {
@@ -149,6 +149,11 @@ const getUserInfo = async (req, res) => {
     const user = req.user;
     console.log('Authenticated user:', user);
 
+    const userEvent = await Event.find({attendees: user._id}).sort({ createdAt: -1 });
+    console.log('User booked events:', userEvent);
+
+
+
     if (!user) {
       return res.status(401).json({ error: 'Login first' });
     }
@@ -159,8 +164,11 @@ const getUserInfo = async (req, res) => {
         name: user.name,
         email: user.email,
         createdAt: user.createdAt,
-      }
+      },
+      userEvents: userEvent
     });
+
+
 
   } catch (error) {
     console.error('Error fetching user info from backend:', error);
@@ -168,7 +176,82 @@ const getUserInfo = async (req, res) => {
   }
 }
 
+const bookMyEvent = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const eventId = req.params.eventId;
+    console.log('user id ', userId);
+    console.log('event id ', eventId);
 
+    if (!userId || !eventId) {
+      return res.status(400).json({ message: 'userId or eventId missing' });
+    }
+
+    const bookedEvent = await Event.findOneAndUpdate(
+      { _id: eventId },
+      { $addToSet: { attendees: userId } },
+      { new: true }
+    );
+
+    if (!bookedEvent) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+    return res.status(200).json({ message: 'Event booked successfully', event: bookedEvent.title});
+  }catch (error) {
+  
+    console.error('Error booking event:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+
+
+
+  }
+}
+
+const unBookMyEvent = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const eventId = req.params.eventId;
+    console.log('user id ', userId);
+    console.log('event id ', eventId);
+    if (!userId || !eventId) {
+      return res.status(400).json({ message: 'userId or eventId missing' });
+    }
+    const unBookedEvent = await Event.findOneAndUpdate(
+      { _id: eventId },
+      { $pull: { attendees: userId } },
+      { new: true }
+    );
+    if (!unBookedEvent) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+    return res.status(200).json({ message: 'Event unbooked successfully', event: unBookedEvent.title });
+  }catch (error) {
+    console.error('Error unbooking event:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
+const isEventBooked = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const eventId = req.params.eventId; 
+    console.log('user id form isBooked', userId);
+    console.log('event id ', eventId);
+    if (!userId || !eventId) {
+      return res.status(400).json({ message: 'userId or eventId missing' });
+    }
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+    const isBooked = Array.isArray(event.attendees) && event.attendees.some(id => id.toString() === userId);
+    return res.json({ isBooked });
+  } catch (error) {
+    console.error('Error checking if event is booked:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  } 
+
+}
 
 
 module.exports = {
@@ -179,5 +262,8 @@ module.exports = {
   createNewUser,
   userExists,
   logoutUser,
-  getUserInfo
+  getUserInfo,
+  bookMyEvent,
+  unBookMyEvent,
+  isEventBooked
 };
