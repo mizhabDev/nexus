@@ -31,7 +31,7 @@ const eventSchema = new mongoose.Schema({
     trim: true
   },
   createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: 'User'
   },
   attendees: {
