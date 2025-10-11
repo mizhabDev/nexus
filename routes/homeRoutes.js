@@ -24,6 +24,12 @@ router.post('/signup', homeController.createNewUser);
 router.post('/signin', homeController.userExists);
 router.post('/logout', requireAuth, homeController.logoutUser);
 
+// put router
+router.put('/edit-event/:eventId', requireAuth, homeController.editEvent);
+
+// delete router
+router.delete('/delete-event/:eventId',requireAuth,homeController.deleteEvent)
+
 
 
 module.exports = router;

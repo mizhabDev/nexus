@@ -206,6 +206,18 @@
     background: #999;
 }
 
+input,textarea {
+    width: 100%;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #6b7280;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+    border: none;      
+    outline: none; 
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .modal.active {

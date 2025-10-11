@@ -257,6 +257,53 @@ const isEventBooked = async (req, res) => {
 
 }
 
+const editEvent = async (req, res) => {
+  try {
+    console.log('Edit event request body:', req.body); // Debug logging
+    
+    const eventId = req.params.eventId;
+    const { title, description, date, time, location, price } = req.body;
+    console.log('Event ID to edit:', eventId);
+    console.log('Updated event data:', req.body);
+    if (!eventId) {
+      return res.status(400).json({ message: 'eventId missing' });
+    }
+    const updatedEvent = await Event.findByIdAndUpdate(
+      eventId,
+      { title, description, date, time, location, price },
+      { new: true }
+    );
+    if (!updatedEvent) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+    return res.status(200).json({success:true, message: 'Event updated successfully', event: updatedEvent });
+  } catch (error) {
+    console.error('Error editing event:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
+const deleteEvent =async (req,res)=> {
+  try {
+    const eventId = req.params.eventId;
+    console.log('event id to delete', eventId);
+    if(!eventId){
+      return res.status(400).json({message:'eventId missing'})
+    }
+    const deletedEvent = await Event.findByIdAndDelete(eventId);
+    if(!deletedEvent){
+      return res.status(404).json({message:'Event not found'});
+    }
+    return res.status(200).json({success:true, message:'Event deleted successfully',event:deletedEvent});
+
+    
+  } catch (error) {
+    console.log("Cannot delete an event",error);
+    return res.status(500).json({error: 'Internal Server Error'})
+    
+  }
+  
+}
 
 module.exports = {
   getHomePage,
@@ -269,5 +316,7 @@ module.exports = {
   getUserInfo,
   bookMyEvent,
   unBookMyEvent,
-  isEventBooked
+  isEventBooked,
+  editEvent,
+  deleteEvent
 };

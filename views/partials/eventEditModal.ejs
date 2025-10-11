@@ -1,0 +1,261 @@
+<link rel="stylesheet" href="/style/eventModal.css">
+
+<!-- Event Details Modal -->
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalEventTitle">Edit you Event</h2>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="modal-detail">
+                <div class="modal-label">🎉 Event title</div>
+                <input type="text" id="title" value="title">
+                <div class="modal-value large"></div>
+
+            </div>
+
+            <div class="modal-detail">
+                <div class="modal-label">📅 Date</div>
+                <div class="modal-value large" id="date"></div>
+                <input type="date" id="event-date" value="">
+            </div>
+
+            <div class="modal-detail">
+                <div class="modal-label">⏰ Time</div>
+                <div class="modal-value large" id="time"></div>
+                <input type="time" id="event-time" value="">
+            </div>
+
+            <div class="modal-detail">
+                <div class="modal-label">📝 Description</div>
+                <div class="modal-value" id="modalEventDescription"></div>
+                <textarea name="description" id="description"></textarea>
+            </div>
+
+            <div class="modal-detail">
+                <div class="modal-label">📍 Location</div>
+                <div class="modal-value large" id="modalEventLocation"></div>
+                <input type="text" id="location" value="location ">
+            </div>
+
+            <div class="modal-detail">
+                <div class="modal-label">💰 Prize</div>
+                <div class="modal-value large" id="modalEventPrize"></div>
+                <input type="text" id="price" value="prize ">
+            </div>
+
+
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+            <button class="btn-book" id="saveBtn">save </button>
+        </div>
+    </div>
+</div>
+
+<script>
+
+
+
+
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Add event listeners to all edit buttons
+        document.querySelectorAll('.btn-edit').forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.stopPropagation();
+
+                const modal = document.getElementById('eventModal');
+                const bookBtn = modal.querySelector('.btn-book');
+                const userId = bookBtn.getAttribute('userId');
+
+
+                const data = {
+                    id: this.getAttribute('data-event-id'),
+                    title: this.getAttribute('data-event-title'),
+                    description: this.getAttribute('data-event-description'),
+                    date: this.getAttribute('data-event-date'),
+                    time: this.getAttribute('data-event-time'),
+                    location: this.getAttribute('data-event-location'),
+                    price: this.getAttribute('data-event-prize'),
+                };
+
+                console.log('Event Data:', data);
+
+
+                let eventTime = data.time;
+                const eventDate = new Date(data.date);
+                const dateString = eventDate.toISOString().slice(0, 10);
+
+                const dateInput = document.getElementById('event-date');
+
+                // Set value and min attribute to prevent past dates
+                dateInput.value = dateString;
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.setAttribute('min', today);
+
+
+
+
+
+                console.log('Formatted Date:', dateString);
+
+
+                // Populate modal fields
+                document.getElementById('title').value = data.title || 'No title found';
+                document.getElementById('description').value = data.description || 'No description found';
+                document.getElementById('event-date').value = dateString || 'No any date found';
+                document.getElementById('event-time').value = data.time || 'No any time found';
+                document.getElementById('location').value = data.location || 'No location found';
+                document.getElementById('price').value = data.price || 'free';
+
+
+
+                modal.dataset.eventId = data.id;
+
+                // Show modal
+                modal.classList.add('active');
+            });
+        });
+
+
+        // event listener to save button
+        document.getElementById('saveBtn').addEventListener('click', edit_event);
+
+        // event listener to delete button
+        document.getElementById('dlt-btn').addEventListener('click',dlt_event);
+
+
+
+
+
+
+
+
+
+    });
+
+    async function edit_event(params) {
+        try {
+
+            const modal = document.getElementById('eventModal');
+            const eventId = modal.dataset.eventId;
+            const updatedEvent = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                date: document.getElementById('event-date').value,
+                time: document.getElementById('event-time').value,
+                location: document.getElementById('location').value,
+                price: document.getElementById('price').value,
+            };
+
+            console.log('Saving edited event:', eventId, updatedEvent);
+
+            const response = await fetch(`/edit-event/${eventId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedEvent),
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert('Event updated successfully!');
+                closeModal();
+
+                location.reload();
+            } else {
+                alert(result.message || 'Failed to update event. Please try again.');
+            }
+
+
+
+        } catch (error) {
+            console.error("Error saving edited event:", error);
+            alert("An error occurred while saving the event. Please try again later.");
+        }
+
+    }
+
+
+    async function dlt_event(params) {
+        try {
+            const modal = document.getElementById('eventModal');
+            const eventId=this.getAttribute('data-event-id');
+            console.log('Deleting event:', eventId);
+
+            const response = await fetch(`/delete-event/${eventId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ eventId: eventId })
+            })
+            if(response.ok){
+                alert("Event deleted");
+                location.reload()
+            }
+            else{
+                alert("some error has happen")
+            }
+        } catch (error) {
+            console.error("Error deleting event:", error);
+            alert("An error occurred while deleting the event. Please try again later.")
+
+        }
+
+    }
+
+
+
+    // Function to close modal
+    function closeModal() {
+        const modal = document.getElementById('eventModal');
+        modal.classList.remove('active');
+    }
+
+
+
+    // Close modal when clicking outside
+    window.onclick = function (event) {
+        const modal = document.getElementById('eventModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeModal();
+        }
+    });
+
+    // Example: Add click listeners to event cards
+    document.addEventListener('DOMContentLoaded', function () {
+        const eventCards = document.querySelectorAll('.event-card');
+
+        eventCards.forEach(card => {
+            card.addEventListener('click', function () {
+                // Get event data from card or data attributes
+                const eventData = {
+                    id: this.dataset.eventId,
+                    title: this.querySelector('.event-title').textContent,
+                    date: this.dataset.eventDate,
+                    time: this.dataset.eventTime,
+                    description: this.querySelector('.event-description').textContent,
+                    location: this.dataset.eventLocation,
+                    prize: this.dataset.eventPrize,
+                    createdBy: this.dataset.eventCreator
+                };
+
+
+            });
+        });
+    });
+</script>

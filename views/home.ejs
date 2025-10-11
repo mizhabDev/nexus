@@ -80,6 +80,7 @@
                             data-event-location="<%= event.location %>"
                             data-event-prize="<%= event.price || 'Free' %>" 
                             data-event-creator="<%= event.createdBy %>"
+                            data-event-attendees="<%= event.attendees %>"
                             
                             userId="<%= user ? user._id : null %>" 
                             onclick="openEventModal(this)">
